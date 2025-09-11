@@ -71,7 +71,6 @@ x-shared-env: &shared-api-worker-env
   EXPOSE_PLUGIN_DEBUGGING_PORT: ${EXPOSE_PLUGIN_DEBUGGING_PORT:-5003}
   PLUGIN_DEBUGGING_HOST: ${PLUGIN_DEBUGGING_HOST:-0.0.0.0}
   PLUGIN_DEBUGGING_PORT: ${PLUGIN_DEBUGGING_PORT:-5003}
-  # 復活させた必須設定
   PLUGIN_WORKING_PATH: ${PLUGIN_WORKING_PATH:-/app/storage/cwd}
 
 services:
@@ -93,6 +92,11 @@ services:
     networks:
       - ssrf_proxy_network
       - default
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5001/health >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
 
   # worker service
   worker:
@@ -103,7 +107,7 @@ services:
       MODE: worker
       INNER_API_KEY_FOR_PLUGIN: ${PLUGIN_DIFY_INNER_API_KEY}
     depends_on:
-      db:
+      api:
         condition: service_healthy
       redis:
         condition: service_started
@@ -121,7 +125,7 @@ services:
       <<: *shared-api-worker-env
       MODE: beat
     depends_on:
-      db:
+      api:
         condition: service_healthy
       redis:
         condition: service_started
@@ -216,7 +220,6 @@ services:
       DIFY_INNER_API_KEY: ${PLUGIN_DIFY_INNER_API_KEY}
       PLUGIN_REMOTE_INSTALLING_HOST: ${PLUGIN_DEBUGGING_HOST}
       PLUGIN_REMOTE_INSTALLING_PORT: ${PLUGIN_DEBUGGING_PORT}
-      # 復活させた必須設定
       PLUGIN_WORKING_PATH: ${PLUGIN_WORKING_PATH}
     ports:
       - "${EXPOSE_PLUGIN_DEBUGGING_PORT}:${PLUGIN_DEBUGGING_PORT}"
@@ -224,6 +227,8 @@ services:
       - /data/dify/plugin_daemon:/app/storage
     depends_on:
       db:
+        condition: service_healthy
+      api:
         condition: service_healthy
 
   # ssrf_proxy server
@@ -272,8 +277,10 @@ services:
       NGINX_SSL_CERT_FILENAME: ${NGINX_SSL_CERT_FILENAME:-dify.crt}
       NGINX_SSL_CERT_KEY_FILENAME: ${NGINX_SSL_CERT_KEY_FILENAME:-dify.key}
     depends_on:
-      - api
-      - web
+      api:
+        condition: service_healthy
+      web:
+        condition: service_started
 
   # Qdrant vector store
   qdrant:
