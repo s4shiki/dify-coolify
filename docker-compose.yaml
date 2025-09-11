@@ -67,7 +67,6 @@ x-shared-env: &shared-api-worker-env
   PIP_MIRROR_URL: ${PIP_MIRROR_URL:-}
   PLUGIN_STORAGE_TYPE: ${PLUGIN_STORAGE_TYPE:-local}
   PLUGIN_STORAGE_LOCAL_ROOT: ${PLUGIN_STORAGE_LOCAL_ROOT:-/app/storage}
-  EXPOSE_PLUGIN_DEBUGGING_HOST: ${EXPOSE_PLUGIN_DEBUGGING_HOST:-localhost}
   EXPOSE_PLUGIN_DEBUGGING_PORT: ${EXPOSE_PLUGIN_DEBUGGING_PORT:-5003}
   PLUGIN_DEBUGGING_HOST: ${PLUGIN_DEBUGGING_HOST:-0.0.0.0}
   PLUGIN_DEBUGGING_PORT: ${PLUGIN_DEBUGGING_PORT:-5003}
@@ -281,6 +280,8 @@ services:
         condition: service_healthy
       web:
         condition: service_started
+    ports:
+      - "7777:80"
 
   # Qdrant vector store
   qdrant:
