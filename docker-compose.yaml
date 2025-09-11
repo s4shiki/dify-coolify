@@ -286,8 +286,6 @@ services:
   # Qdrant vector store
   qdrant:
     image: langgenius/qdrant:v1.7.3
-    profiles:
-      - qdrant
     restart: always
     volumes:
       - /data/dify/qdrant:/qdrant/storage
