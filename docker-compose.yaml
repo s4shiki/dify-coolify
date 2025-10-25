@@ -11,6 +11,9 @@ x-shared-env: &shared-api-worker-env
   SECRET_KEY: ${SECRET_KEY:-sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U}
   DB_HOST: ${DB_HOST:-db}
   DB_PASSWORD: ${DB_PASSWORD:-difyai123456}
+  DB_USERNAME: ${DB_USERNAME:-postgres}
+  DB_PORT: ${DB_PORT:-5432}
+  DB_DATABASE: ${DB_DATABASE:-dify}
   REDIS_HOST: ${REDIS_HOST:-redis}
   REDIS_PASSWORD: ${REDIS_PASSWORD:-difyai123456}
   CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://:difyai123456@redis:6379/1}
