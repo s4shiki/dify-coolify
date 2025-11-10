@@ -27,3 +27,4 @@ Follow these steps to deploy to Coolify. These instructions include workarounds 
 6.  **Troubleshooting**:
     *   Check the "Logs" tab for any errors.
     *   If you encounter a migration error, click the "Stop" button to halt the application, and then click "Deploy" again to restart the process.
+    *   When enabling **Connect To Predefined Network**, no manual changes are required—each container now forces Docker's embedded DNS resolver (`127.0.0.11`), so `nginx` keeps resolving `web`/`api` internally and 502 responses on `${EXPOSE_NGINX_PORT}` are avoided.

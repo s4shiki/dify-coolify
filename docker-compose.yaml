@@ -47,9 +47,14 @@ x-shared-env: &shared-api-worker-env
   SANDBOX_HTTP_PROXY: ${SANDBOX_HTTP_PROXY:-http://ssrf_proxy:3128}
   SANDBOX_HTTPS_PROXY: ${SANDBOX_HTTPS_PROXY:-http://ssrf_proxy:3128}
 
+x-docker-resolver: &docker-internal-resolver
+  dns:
+    - 127.0.0.11
+
 services:
   # API service
   api:
+    <<: *docker-internal-resolver
     image: langgenius/dify-api:1.9.2
     restart: always
     environment:
@@ -79,6 +84,7 @@ services:
   # worker service
   # The Celery worker for processing the queue.
   worker:
+    <<: *docker-internal-resolver
     image: langgenius/dify-api:1.9.2
     restart: always
     environment:
@@ -106,6 +112,7 @@ services:
   # worker_beat service
   # Celery beat for scheduling periodic tasks.
   worker_beat:
+    <<: *docker-internal-resolver
     image: langgenius/dify-api:1.9.2
     restart: always
     environment:
@@ -124,6 +131,7 @@ services:
 
   # Frontend web application.
   web:
+    <<: *docker-internal-resolver
     image: langgenius/dify-web:1.9.2
     restart: always
     environment:
@@ -151,6 +159,7 @@ services:
 
   # The postgres database.
   db:
+    <<: *docker-internal-resolver
     image: postgres:15-alpine
     restart: always
     environment:
@@ -186,6 +195,7 @@ services:
 
   # The redis cache.
   redis:
+    <<: *docker-internal-resolver
     image: redis:6-alpine
     restart: always
     environment:
@@ -204,6 +214,7 @@ services:
 
   # The DifySandbox
   sandbox:
+    <<: *docker-internal-resolver
     image: langgenius/dify-sandbox:0.2.12
     restart: always
     environment:
@@ -228,6 +239,7 @@ services:
 
   # plugin daemon
   plugin_daemon:
+    <<: *docker-internal-resolver
     image: langgenius/dify-plugin-daemon:0.3.3-local
     restart: always
     environment:
@@ -268,6 +280,7 @@ services:
   # for more information, please refer to
   # https://docs.dify.ai/learn-more/faq/install-faq#18-why-is-ssrf-proxy-needed%3F
   ssrf_proxy:
+    <<: *docker-internal-resolver
     image: ubuntu/squid:latest
     restart: always
     volumes:
@@ -293,6 +306,7 @@ services:
   # The nginx reverse proxy.
   # used for reverse proxying the API service and Web service.
   nginx:
+    <<: *docker-internal-resolver
     image: nginx:latest
     restart: always
     volumes:
@@ -333,6 +347,7 @@ services:
   # Qdrant vector store.
   # (if used, you need to set VECTOR_STORE to qdrant in the api & worker service.)
   qdrant:
+    <<: *docker-internal-resolver
     image: langgenius/qdrant:v1.7.3
     restart: always
     volumes:
